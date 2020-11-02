@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        input{
+            width: 20px;
+            height: 20px;
+        }
+        label{
+            font-size: 26px;
+        }
+        #text_field{
+            background-color: silver;
+            width: 100%;
+            /*height: 300px;*/
+        }
+        #categoryDiv{
+            display: flex;
+            justify-content: space-around;
+            align-items: stretch;
+            flex-wrap: wrap;
+        }
+        button{
+            width: 100px;
+            height: 35px;
+            font-size: 18px;
+        }
+        .jokesCategoryInterface {
+            width: 15%;
+            height: 45px;
+            border: 2px solid black;
+            border-radius: 6px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 5px;
+            margin-top: 5px;
+
+        }
+        #randomJokeDiv{
+            font-size: 32px;
+            font-weight: bold;
+            border: 3px solid darkblue;
+        }
+        #categoryJoke{
+            font-size: 32px;
+            font-weight: bold;
+            border: 3px solid darkblue;
+        }
+    </style>
+</head>
+
+<body>
+<form>
+    <div>
+        <input type="radio" id="random" name="chuck" value="random">
+        <label for="random">Generate random joke</label>
+    </div>
+    <div>
+        <input type="radio" id="category" name="chuck" value="category">
+        <label for="category">choose category</label>
+    </div>
+    <button type="submit">get joke</button>
+    <div id="text_field">
+        <div id="randomJokeDiv"></div>
+        <div id="categoryDiv"></div>
+        <div id="categoryJoke"></div>
+    </div>
+</form>
+<script>
+    /*Логика такая,под каждый сабмит создаётся класс промис, с условием. если если чекбокс верхний+ отправляется запрос,
+    то делаем тото и тото, если нижний  то делаем соответственно другое*/
+
+    let form = document.querySelector('form'),
+        inputs = document.querySelectorAll('input'),
+        // inputVariableRandom=false,
+        // inputVariableCategory=false,
+        randomJokeDiv=document.getElementById('randomJokeDiv');
+
+    class Joke{
+        constructor(url) {
+            this.url=url;
+        }
+        fetching(){
+            return fetch(this.url);
+        }
+        async joke(){
+            let response = await fetch(this.url),
+                joke = await response.json();
+            return Promise.resolve(joke);
+        }
+    }
+
+    form.onclick=function (event) {
+        form.addEventListener('submit',(e)=>{
+            e.preventDefault();
+        });
+        console.log('asdadsfsdf');
+        console.log(event);
+        // if (event.target.value === 'random'){
+        //     inputVariableRandom=true;
+        //     inputVariableCategory=false;
+        // }
+        // if(event.target.value === 'category'){
+        //     inputVariableRandom=false;
+        //     inputVariableCategory=true;
+        // }
+        if (event.target.localName==='button' /*&& inputVariableRandom*/){
+            let newJokeRandom = new Joke('https://api.chucknorris.io/jokes/random')
+            .joke()
+            .then(data=>{
+                randomJokeDiv.innerHTML=data.value;
+                // (async (data) => {
+                //     randomJokeDiv.innerHTML= await data.value
+                // })();
+            })
+        }
+        if(/*inputVariableCategory &&*/ event.target.value === 'category'){
+            let newJoke = new Joke('https://api.chucknorris.io/jokes/categories')
+                .joke()
+                .then(data=>{
+                    console.log(data);
+                    let categoryContainer = document.getElementById('categoryDiv');
+                        categoryContainer.innerHTML='';
+                    for (let key in data){
+                        let jokeCategory = document.createElement('span');
+                        jokeCategory.classList.add('jokesCategoryInterface');
+                        jokeCategory.innerHTML=data[key];
+                        categoryContainer.appendChild(jokeCategory)
+                    }
+                });
+        }
+
+        if(event.target.localName==='span'){
+            let newJoke = new Joke(`https://api.chucknorris.io/jokes/random?category=${event.target.innerHTML}`)
+                .joke()
+                .then(data=>{
+                    let categoryJoke = document.getElementById('categoryJoke');
+                    categoryJoke.innerHTML='';
+                        let textCategoryJoke = document.createElement('h3');
+                        // jokeCategory.classList.add('jokesCategoryInterface');
+                        textCategoryJoke.innerHTML=data.value;
+                        categoryJoke.appendChild(textCategoryJoke)
+                });
+            console.log(`we are in ${event.target.innerHTML}`)
+
+        }
+
+    }
+
+
+</script>
+</body>
+</html>
