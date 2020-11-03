@@ -53,6 +53,9 @@
             font-weight: bold;
             border: 3px solid darkblue;
         }
+        .chosen{
+            background-color: #469bf5;
+        }
     </style>
 </head>
 
@@ -141,14 +144,25 @@
             let newJoke = new Joke(`https://api.chucknorris.io/jokes/random?category=${event.target.innerHTML}`)
                 .joke()
                 .then(data=>{
+                    event.target.classList.add('chosen');
+                    // console.dir(event.target);
                     let categoryJoke = document.getElementById('categoryJoke');
                     categoryJoke.innerHTML='';
                         let textCategoryJoke = document.createElement('h3');
                         // jokeCategory.classList.add('jokesCategoryInterface');
                         textCategoryJoke.innerHTML=data.value;
-                        categoryJoke.appendChild(textCategoryJoke)
+                        categoryJoke.appendChild(textCategoryJoke);
+
+                    let chosenSpan=document.querySelectorAll('span');
+                    for (let i=0;i<chosenSpan.length;i++){
+                        if (chosenSpan[i].classList.contains('chosen') && event.target.innerHTML !==chosenSpan[i].innerHTML){
+                            chosenSpan[i].classList.remove('chosen')
+                        }
+                    }
+                    // console.log(chosenSpan[0].innerHTML);
+                    // console.dir(event.target.innerHTML)
                 });
-            console.log(`we are in ${event.target.innerHTML}`)
+            // console.log(`we are in ${event.target.innerHTML}`)
 
         }
 
